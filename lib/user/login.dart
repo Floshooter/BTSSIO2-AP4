@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:ap4_projet/server/api.dart';
 import 'package:flutter/material.dart';
 
@@ -11,8 +10,34 @@ class LoginPage extends StatelessWidget {
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
+    // Fonction pour se connecter avec un compte spécifique
+    void loginWithAccount(String email, String password) async {
+      try {
+        // Authentifier l'utilisateur
+        Map<String, dynamic> userData = await authenticateUser(email, password);
+
+        Map<String, dynamic> user = userData['user'] ?? {};
+        
+        // ignore: use_build_context_synchronously
+        Navigator.pushNamed(
+          context,
+          '/',
+          arguments: user, 
+        );
+      } catch (e) {
+        // Afficher un message d'erreur
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+          ),
+        );
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Login'),
       ),
       body: Padding(
@@ -39,23 +64,26 @@ class LoginPage extends StatelessWidget {
               onPressed: () async {
                 final String email = emailController.text;
                 final String password = passwordController.text;
-
-                try {
-                  // Authentifier l'utilisateur
-                  Map<String, dynamic> userData = await authenticateUser(email, password);
-                  
-                  // ignore: use_build_context_synchronously
-                  Navigator.pushNamed(context, '/main', arguments: userData);
-                } catch (e) {
-                  // Afficher un message d'erreur
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(e.toString()),
-                    ),
-                  );
-                }
+                // Appeler la fonction de connexion avec les données entrées
+                loginWithAccount(email, password);
               },
               child: const Text('Login'),
+            ),
+            const SizedBox(height: 20),
+            // Boutons pour la connexion avec des comptes spécifiques
+            ElevatedButton(
+              onPressed: () {
+                // Se connecter avec le premier compte
+                loginWithAccount('a.lemercier@m2l.fr', 'angela@staff');
+              },
+              child: const Text('Staff'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Se connecter avec le premier compte
+                loginWithAccount('davidgroove@gmail.com', 'davidgroove64');
+              },
+              child: const Text('Utilisateur'),
             ),
             TextButton(
               onPressed: () {

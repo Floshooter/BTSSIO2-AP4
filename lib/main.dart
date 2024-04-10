@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dashboard/dashboard.dart';
+import 'package:ap4_projet/dashboard/dashboard.dart';
 import 'dashboard/logs.dart';
 import 'settings/settings.dart';
 import 'user/login.dart';
@@ -12,10 +12,10 @@ class BottomNavigationBarExampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/',
+      initialRoute: '/login',
       routes: {
-        '/': (context) => const LoginPage(), 
-        '/main': (context) => const BottomNavigationBarExample(), 
+        '/login': (context) => const LoginPage(), 
+        '/': (context) => const BottomNavigationBarExample(), 
       },
     );
   }
@@ -34,7 +34,7 @@ class _BottomNavigationBarExampleState
   int _selectedIndex = 0;
 
   static final List<Widget> _widgetOptions = <Widget>[
-    const DashboardPage(),
+    const DashboardPage(userData: {},),
     const LogsPage(),
     const SettingsPage(),
   ];
