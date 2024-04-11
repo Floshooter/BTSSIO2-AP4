@@ -3,7 +3,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-String url = 'http://10.74.2.81:8001';
+// String url = 'http://10.74.2.81:8001'; //Serveur local (mon pc)
+String url = 'http://192.168.1.28:8001'; //Serveur SISR IPSSI
 
 Future<Map<String, dynamic>> authenticateUser(String email, String password) async {
   String loginUrl = '$url/users/login';

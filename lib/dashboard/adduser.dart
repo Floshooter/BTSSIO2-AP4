@@ -1,13 +1,19 @@
 // adduser.dart
+// ignore_for_file: must_be_immutable
+
 import 'package:ap4_projet/server/api.dart';
 import 'package:flutter/material.dart';
 
 class AddUserPage extends StatefulWidget {
-  const AddUserPage({Key? key}) : super(key: key);
+  final Future<List<dynamic>> futureUsers;
+  final void Function() onUserAdded;
+  const AddUserPage({Key? key, required this.futureUsers, required this.onUserAdded}) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
   _AddUserPageState createState() => _AddUserPageState();
+  
+  void refreshUserData() {}
 }
 
 class _AddUserPageState extends State<AddUserPage> {
@@ -65,6 +71,8 @@ class _AddUserPageState extends State<AddUserPage> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Utilisateur ajouté avec succès')),
                   );
+                  widget.onUserAdded();
+                  Navigator.pop(context);
                 }).catchError((error) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Erreur lors de l\'ajout de l\'utilisateur')),

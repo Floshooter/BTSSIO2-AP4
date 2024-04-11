@@ -1,5 +1,6 @@
 import 'package:ap4_projet/dashboard/addproduct.dart';
 import 'package:ap4_projet/dashboard/adduser.dart';
+import 'package:ap4_projet/dashboard/information_product.dart';
 import 'package:ap4_projet/server/api.dart';
 import 'package:flutter/material.dart';
 
@@ -320,8 +321,11 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
                                 IconButton(
                                   icon: const Icon(Icons.visibility),
                                   onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Visualiser')),
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductInformationPage(product: item),
+                                      ),
                                     );
                                   },
                                 ),
@@ -482,7 +486,14 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const AddUserPage(),
+                builder: (context) => AddUserPage(
+                  futureUsers: _futureUsers,
+                  onUserAdded: () {
+                    setState(() {
+                      _futureUsers = fetchUsers();
+                    });
+                  }
+                ),
               ),
             );
           } else {
