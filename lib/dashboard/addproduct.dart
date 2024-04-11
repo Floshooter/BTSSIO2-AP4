@@ -2,7 +2,9 @@ import 'package:ap4_projet/server/api.dart';
 import 'package:flutter/material.dart';
 
 class AddProductPage extends StatefulWidget {
-  const AddProductPage({Key? key}) : super(key: key);
+  final Future<List<dynamic>> futureItems;
+  final void Function() onProductAdded;
+  const AddProductPage({Key? key, required this.futureItems, required this.onProductAdded}) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -71,6 +73,8 @@ class _AddProductPageState extends State<AddProductPage> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Produit ajouté avec succès')),
                     );
+                    widget.onProductAdded();
+                    Navigator.pop(context);
                   })
                   .catchError((error) {
                     ScaffoldMessenger.of(context).showSnackBar(

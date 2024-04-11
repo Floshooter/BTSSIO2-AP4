@@ -500,7 +500,14 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const AddProductPage(),
+                builder: (context) => AddProductPage(
+                  futureItems: _futureItems,
+                  onProductAdded: () {
+                    setState(() {
+                      _futureItems = fetchItems();
+                    });
+                  }
+                ),
               ),
             );
           }

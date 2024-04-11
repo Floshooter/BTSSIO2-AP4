@@ -38,7 +38,7 @@ class _LogsPageState extends State<LogsPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Logs Page'),
+        title: const Text('Journaux d\'événements'),
       ),
       body: Center(
         child: Column(
