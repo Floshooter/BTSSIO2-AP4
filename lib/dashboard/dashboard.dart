@@ -26,6 +26,90 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
     _futureItems = fetchItems();
     _tabController = TabController(length: 2, vsync: this);
   }
+  // void _showFilterForm(BuildContext context) {
+  //   String filterValue = '';
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return StatefulBuilder(
+  //         builder: (context, setState) {
+  //           return AlertDialog(
+  //             title: const Text('Filtrer les produits'),
+  //             content: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 TextField(
+  //                   onChanged: (value) {
+  //                     setState(() {
+  //                       filterValue = value;
+  //                     });
+  //                   },
+  //                   decoration: const InputDecoration(
+  //                     labelText: 'Rechercher par nom',
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //             actions: [
+  //               TextButton(
+  //                 onPressed: () {
+  //                   Navigator.pop(context);
+  //                 },
+  //                 child: const Text('Annuler'),
+  //               ),
+  //               TextButton(
+  //                 onPressed: () {
+  //                   if (filterValue.isEmpty) {
+  //                     ScaffoldMessenger.of(context).showSnackBar(
+  //                       const SnackBar(
+  //                         content: Text("Veuillez entrer au moins un caractère."),
+  //                       ),
+  //                     );
+  //                   } else {
+  //                     _filterProducts(filterValue);
+  //                     Navigator.pop(context);
+  //                   }
+  //                 },
+  //                 child: const Text('Rechercher'),
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
+  // void _filterProducts(String filterValue) {
+  //   fetchItemsByName(filterValue).then((filteredItems) {
+  //     setState(() {
+  //       _futureItems = Future.value(filteredItems);
+  //     });
+  //     if (filteredItems.isEmpty) {
+  //       showDialog(
+  //         context: context,
+  //         builder: (BuildContext context) {
+  //           return AlertDialog(
+  //             title: const Text('Aucun produit correspondant'),
+  //             content: const Text('Il n\'y a aucun produit correspondant au filtre spécifié.'),
+  //             actions: [
+  //               TextButton(
+  //                 onPressed: () {
+  //                   Navigator.pop(context);
+  //                 },
+  //                 child: const Text('OK'),
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     }
+  //   }).catchError((error) {
+  //     print('Error filtering products: $error');
+  //   });
+  // }
+
 
   @override
   void dispose() {
@@ -46,6 +130,20 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
             Tab(text: 'Produits'),
           ],
         ),
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.filter_list),
+        //     onPressed: () {
+        //       _showFilterForm(context);
+        //     },
+        //   ),
+        //   IconButton(
+        //     icon: const Icon(Icons.close),
+        //     onPressed: () {
+        //       _filterProducts("");
+        //     },
+        //   ),
+        // ],
       ),
       body: TabBarView(
         controller: _tabController,
@@ -184,7 +282,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
                                             }).catchError((error) {
                                               // Afficher un SnackBar d'erreur
                                               ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(content: Text('Erreur lors de la mise à jour de l\'utilisateur')),
+                                                const SnackBar(content: Text('Erreur lors de la mise à jour de l\'utilisateur (dashboard)')),
                                               );
                                             });
                                           },
