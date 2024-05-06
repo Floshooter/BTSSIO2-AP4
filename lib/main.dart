@@ -49,6 +49,7 @@ class _BottomNavigationBarExampleState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color.fromARGB(255, 255, 85, 85),
         centerTitle: true,
         title: Row(

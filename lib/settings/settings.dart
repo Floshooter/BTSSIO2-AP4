@@ -42,7 +42,7 @@ class SettingsPage extends StatelessWidget {
                           Text('Prénom: ${UserData.userDataConnected?['user']['firstname']}'),
                           Text('Nom d\'utilisateur: ${UserData.userDataConnected?['user']['username']}'),
                           Text('Email: ${UserData.userDataConnected?['user']['email']}'),
-                          Text('Niveau de permission: ${UserData.userDataConnected?['user']['permLevel'] == 0 ? 'Utilisateur' : UserData.userDataConnected?['user']['perm_level'] == 1 ? 'Staff' : 'Administrateur'}'),
+                          Text('Niveau de permission: ${UserData.userDataConnected?['user']['permLevel'] == 1 ? 'Staff' : 'Administrateur'}'),
                         ],
                       ),
                       actions: [

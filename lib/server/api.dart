@@ -1,15 +1,18 @@
 // ignore_for_file: avoid_print
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 
-String url = 'http://192.168.1.28:8001'; //Serveur SISR IPSSI
+String url = 'http://192.168.1.28:8001';
 
 class UserData {
   static Map<String, dynamic>? userDataConnected;
 }
 
-Future<Map<String, dynamic>> authenticateUser(String email, String password) async {
+Future<Map<String, dynamic>> authenticateUser(
+    String email, String password) async {
   String loginUrl = '$url/users/login';
 
   Map<String, String> body = {
@@ -27,6 +30,7 @@ Future<Map<String, dynamic>> authenticateUser(String email, String password) asy
       headers: headers,
       body: jsonEncode(body),
     );
+    debugPrint('connexion: ${response.body}');
 
     if (response.statusCode == 200) {
       Map<String, dynamic> userDataConnected = jsonDecode(response.body);
@@ -34,13 +38,13 @@ Future<Map<String, dynamic>> authenticateUser(String email, String password) asy
       debugPrint('userData: ${userDataConnected['user']}');
 
       UserData.userDataConnected = userDataConnected;
-      
 
       int permLevel = userDataConnected['user']['permLevel'] as int;
       if (permLevel == 1 || permLevel == 2) {
         return userDataConnected;
       } else {
-        throw Exception('Permission insuffisante pour accéder à l\'application');
+        throw Exception(
+            'Permission insuffisante pour accéder à l\'application');
       }
     } else if (response.statusCode == 404) {
       throw Exception('Utilisateur non trouvé');
@@ -48,6 +52,7 @@ Future<Map<String, dynamic>> authenticateUser(String email, String password) asy
       throw Exception('Mot de passe incorrect');
     }
   } catch (e) {
+    debugPrint('Erreur lors de l\'authentification : $e');
     throw Exception('Erreur lors de l\'authentification : $e');
   }
 }
@@ -71,7 +76,6 @@ Future<List<dynamic>> fetchUsers() async {
     if (response.statusCode == 200) {
       return List<dynamic>.from(jsonDecode(response.body));
     } else if (response.statusCode == 401) {
-      // Le token est invalide ou a expiré, donc on le supprime
       throw Exception('Utilisateur non connecté');
     } else {
       throw Exception('Failed to load users: ${response.statusCode}');
@@ -81,7 +85,6 @@ Future<List<dynamic>> fetchUsers() async {
   }
 }
 
-
 Future<List<dynamic>> fetchItems() async {
   String itemUrl = '$url/boutique';
 
@@ -90,12 +93,14 @@ Future<List<dynamic>> fetchItems() async {
     if (authToken == null) {
       throw Exception('Token invalide ou expiré');
     }
+
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': authToken,
     };
 
-    http.Response response = await http.get(Uri.parse(itemUrl), headers: headers);
+    http.Response response =
+    await http.get(Uri.parse(itemUrl), headers: headers);
 
     if (response.statusCode == 200) {
       return List<dynamic>.from(jsonDecode(response.body));
@@ -106,17 +111,6 @@ Future<List<dynamic>> fetchItems() async {
     throw Exception('Erreur lors du chargement des articles : $e');
   }
 }
-// Future<List<dynamic>> fetchItemsByName(String value) async {
-//   String productNameUrl = '$url/boutique/s?name=$value';
-
-//   final response = await http.get(Uri.parse(productNameUrl));
-//   if (response.statusCode == 200) {
-//     return List<dynamic>.from(jsonDecode(response.body));
-//   } else {
-//     throw Exception('Failed to load items by name');
-//   }
-// }
-
 
 Future<void> addUser(Map<String, dynamic> userData) async {
   String addEmployeeUrl = '$url/users/addemployee';
@@ -129,7 +123,7 @@ Future<void> addUser(Map<String, dynamic> userData) async {
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $authToken',
+      'Authorization': authToken,
     };
 
     final response = await http.post(
@@ -148,7 +142,7 @@ Future<void> addUser(Map<String, dynamic> userData) async {
   }
 }
 
-Future<void> addProduct(Map<String, dynamic> productData) async {
+Future<void> addProduct(File? image, Map<String, dynamic> productData) async {
   String addProductUrl = '$url/boutique/additem';
 
   try {
@@ -157,27 +151,47 @@ Future<void> addProduct(Map<String, dynamic> productData) async {
       throw Exception('Utilisateur non connecté');
     }
 
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $authToken',
-    };
+    String? imageName = image != null ? 'img-${DateTime.now().millisecondsSinceEpoch}${path.extension(image.path)}' : null;
 
-    final response = await http.post(
-      Uri.parse(addProductUrl),
-      headers: headers,
-      body: jsonEncode(productData),
-    );
+    var request = http.MultipartRequest('POST', Uri.parse(addProductUrl));
+
+    if (image != null) {
+      var imageStream = http.ByteStream(image.openRead());
+      var imageLength = await image.length();
+      var imageMultipart = http.MultipartFile(
+        'thumbnail',
+        imageStream,
+        imageLength,
+        filename: imageName,
+      );
+      request.files.add(imageMultipart);
+    }
+
+    Map<String, String> productDataString = productData.map((key, value) => MapEntry(key, value.toString()));
+
+    Map<String, String> imageStringData = image != null ? {'thumbnail': imageName!} : {};
+
+    request.fields.addAll({...productDataString, ...imageStringData});
+
+    request.headers['Content-Type'] = 'multipart/form-data';
+    request.headers['Authorization'] = authToken;
+
+    var response = await request.send();
+
+    // debugPrint('produit: $productData');
+    // debugPrint('thumbnail: $imageStringData');
+    // debugPrint('addProductUrl: $addProductUrl');
 
     if (response.statusCode == 200) {
       print('Produit ajouté avec succès');
     } else {
-      throw Exception('Erreur lors de l\'ajout du produit: ${response.statusCode}');
+      throw Exception(
+          'Erreur lors de l\'ajout du produit souhaité: ${response.reasonPhrase}\n');
     }
   } catch (e) {
-    throw Exception('Erreur lors de l\'ajout du produit : $e');
+    throw Exception('Erreur lors de l\'ajout du produit : $e\n');
   }
 }
-
 
 Future<void> deleteUser(int userId) async {
   String deleteUserUrl = '$url/users/deleteUser/$userId';
@@ -190,7 +204,7 @@ Future<void> deleteUser(int userId) async {
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $authToken',
+      'Authorization': authToken,
     };
 
     final response = await http.delete(
@@ -219,7 +233,7 @@ Future<void> deleteProduct(int productId) async {
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $authToken',
+      'Authorization': authToken,
     };
 
     final response = await http.delete(
@@ -236,6 +250,7 @@ Future<void> deleteProduct(int productId) async {
     throw Exception('Erreur lors de la suppression du produit : $e');
   }
 }
+
 Future<void> updateUser(int userId, Map<String, dynamic> userData) async {
   String updateUserUrl = '$url/users/updateUser/$userId';
 
@@ -247,7 +262,7 @@ Future<void> updateUser(int userId, Map<String, dynamic> userData) async {
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $authToken',
+      'Authorization': authToken,
     };
 
     final response = await http.put(
@@ -268,16 +283,16 @@ Future<void> updateUser(int userId, Map<String, dynamic> userData) async {
 
 Future<void> updateProduct(int productId, Map<String, dynamic> productData) async {
   String updateProductUrl = '$url/boutique/updateitem/$productId';
-
   try {
     String? authToken = UserData.userDataConnected?['token'];
+
     if (authToken == null) {
       throw Exception('Utilisateur non connecté');
     }
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $authToken',
+      'Authorization': authToken,
     };
 
     final response = await http.put(
@@ -297,5 +312,3 @@ Future<void> updateProduct(int productId, Map<String, dynamic> productData) asyn
     throw Exception('Erreur lors de la mise à jour du produit : $e');
   }
 }
-
-

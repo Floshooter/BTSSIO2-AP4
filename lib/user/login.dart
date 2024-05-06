@@ -48,7 +48,7 @@ class LoginPage extends StatelessWidget {
             TextFormField(
               controller: emailController, // Contrôleur pour le champ de texte de l'username/email
               decoration: const InputDecoration(
-                labelText: 'Username or email',
+                labelText: 'Email',
               ),
             ),
             const SizedBox(height: 20),
@@ -56,7 +56,7 @@ class LoginPage extends StatelessWidget {
               controller: passwordController, // Contrôleur pour le champ de texte du mot de passe
               obscureText: true,
               decoration: const InputDecoration(
-                labelText: 'Password',
+                labelText: 'Mot de passe',
               ),
             ),
             const SizedBox(height: 20),
@@ -87,7 +87,6 @@ class LoginPage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                // Rediriger vers une page pour modifier son mot de passe.
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Modification du mot de passe en cours...'),

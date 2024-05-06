@@ -185,7 +185,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
                                 const Icon(Icons.lock, color: Colors.grey),
                                 const SizedBox(width: 5),
                                 Text(
-                                  user['perm_level'] == 0 ? 'Utilisateur' : user['perm_level'] == 1 ? 'Staff' : 'Administrateur', 
+                                  user['perm_level'] == 0 ? 'Utilisateur' : user['perm_level'] == 1 ? 'Staff' : 'Administrateur',
                                   style: TextStyle(color: user['perm_level'] == 0 ? Colors.green : user['perm_level'] == 1 ? Colors.orange : Colors.red)
                                   ),
                               ],
@@ -487,8 +487,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
                                             ),
                                             TextButton(
                                               onPressed: () {
-                                                if (selectedField == null || selectedField!.isEmpty || newValueController.text.isEmpty) {
-                                                  // Afficher une erreur si aucun champ ou aucune valeur n'est sélectionné
+                                                if (selectedField == null || selectedField!.isEmpty || newValueController.text.isEmpty) {// Afficher une erreur si aucun champ ou aucune valeur n'est sélectionné
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     const SnackBar(content: Text('Veuillez choisir un champ et saisir une valeur')),
                                                   );
@@ -499,7 +498,6 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
                                                   'field': selectedField!,
                                                   'value': newValueController.text,
                                                 }).then((_) {
-                                                  // Afficher un SnackBar de succès
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     const SnackBar(content: Text('Produit mis à jour avec succès')),
                                                   );
@@ -508,7 +506,6 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
                                                   });
                                                   Navigator.pop(context); // Fermer le AlertDialog
                                                 }).catchError((error) {
-                                                  // Afficher un SnackBar d'erreur
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     const SnackBar(content: Text('Erreur lors de la mise à jour du produit')),
                                                   );
@@ -541,17 +538,14 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
                                             TextButton(
                                               onPressed: () {
                                                 deleteProduct(item['id_items']).then((_) {
-                                                  // Afficher un SnackBar de confirmation
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     const SnackBar(content: Text('Produit supprimé avec succès')),
                                                   );
-                                                  // Rafraîchir la liste des produits en rechargeant la page
                                                   setState(() {
                                                     _futureItems = fetchItems();
                                                   });
-                                                  Navigator.of(context).pop(); // Fermer le AlertDialog
+                                                  Navigator.of(context).pop();
                                                 }).catchError((error) {
-                                                  // En cas d'erreur, afficher un message d'erreur
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     const SnackBar(content: Text('Erreur lors de la suppression du produit')),
                                                   );
@@ -578,40 +572,45 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          if (_tabController.index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddUserPage(
-                  futureUsers: _futureUsers,
-                  onUserAdded: () {
-                    setState(() {
-                      _futureUsers = fetchUsers();
-                    });
-                  }
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(bottom: 10.0, right: 0),
+        child: FloatingActionButton(
+          onPressed: () {
+            if (_tabController.index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddUserPage(
+                    futureUsers: _futureUsers,
+                    onUserAdded: () {
+                      setState(() {
+                        _futureUsers = fetchUsers();
+                      });
+                    }
+                  ),
                 ),
-              ),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddProductPage(
-                  futureItems: _futureItems,
-                  onProductAdded: () {
-                    setState(() {
-                      _futureItems = fetchItems();
-                    });
-                  }
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddProductPage(
+                    futureItems: _futureItems,
+                    onProductAdded: () {
+                      setState(() {
+                        _futureItems = fetchItems();
+                      });
+                    }
+                  ),
                 ),
-              ),
-            );
-          }
-        },
-        label: const Text('Ajouter'),
-        icon: const Icon(Icons.add),
+              );
+            }
+          },
+          tooltip: 'Ajouter',
+          child: const Icon(Icons.add),
+          backgroundColor: const Color.fromARGB(255, 255, 85, 85),
+          elevation: 8.0,
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
